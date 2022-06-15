@@ -1,0 +1,199 @@
+<tml>
+<head>
+<meta charset="windows-1251">
+<!--Подключаем дополнительные библиотеки JQUERY для
+использоhвания оператора $, bootstrap для оформления (библиотека стилей)-->
+
+<link rel="stylesheet"
+
+href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+<link rel="stylesheet"
+
+href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+
+<script
+
+src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+</head>
+<body>
+<!-- Атрибут class нужен для красоты, ID для использования в коде
+
+-->
+
+<div class="container">
+<div class="row" style="margin-top : 10px">
+<div class="col-sm-3">
+Key: <input type="text" id="key" class="form-control"
+
+placeholder="" value="key" style="width : 100px">
+
+Text: <input type="text" id="text" class="form-control"
+
+placeholder="" value="text" style="width : 300px">
+
+</div>
+<div class="col-sm-3">
+</div>
+</div>
+<div class="row" style="margin-top : 10px">
+<div class="col-sm-3">
+<button type="button" id="bClick" class="btn btn-
+
+primary">Encoding...</button><br>
+
+Encoding: <input type="text" id="encode" class="form-
+
+control" placeholder="" value="" style="width : 300px">
+
+Decoding: <input type="text" id="decode" class="form-
+
+control" placeholder="" value="" style="width : 300px">
+
+</div>
+
+</div>
+</br>
+</body>
+<script>
+//Начало программы
+//Таблица разрешенных символов
+
+let arr_en = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r',
+
+'s', 't', 'u', 'v', 'w', 'x', 'y', 'z', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0'];
+
+//let arr_en = ['а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и', 'й', 'к', 'л', 'м', 'н', 'о', 'п','р', 'с', 'т', 'у', 'ф', 'х', 'ц', 'ч', 'ш', 'щ', 'ъ','ы','ь','э', 'ю', 'я'];
+//Создание таблицы кодирования Вижинера
+
+M = arr_en.length;
+var elem = window.document.getElementById('table');
+if (elem!=null) elem.remove();
+var elem = window.document.getElementById('caption');
+if (elem!=null) elem.remove();
+var table = document.createElement('table');
+table.setAttribute('id','table');
+table.setAttribute('border','1');
+table.setAttribute('cellspacing','10');
+table.setAttribute('cellpadding','10');
+var caption = document.createElement('caption');
+caption.setAttribute('id','caption');
+caption.setAttribute('style','caption-side : top');
+caption.innerHTML = "Table of encoding by Vizhiner code";
+table.caption = caption;
+var b = window.document.body;
+b.appendChild(table);
+for(let i = 0; i <= M; i++){
+row = table.insertRow(-1);
+cell = row.insertCell(-1);
+cell.setAttribute('style','font-weight : bold');
+if (i>0) {cell.innerHTML=arr_en[i-1]};
+for(let j = 1; j <= M; j++){
+cell = row.insertCell(-1);
+cell.innerHTML=arr_en[j-1];
+if (i>1) cell.innerHTML=arr_en[(j-1+i-1) % M];
+if (i==0) cell.setAttribute('style','font-weight : bold');
+}
+}
+
+//Анализ строки запуска программы
+
+var queryString = location.search.slice(1);//the analisys of start parameters of query string of Internet browser
+var obj = {};
+if (queryString) {
+var arr = queryString.split('&amp;');
+for (i=0; i<=arr.length-1; i++){
+ind = arr[i].indexOf('key');
+if (ind > -1) {
+key = arr[i].slice(ind+3+1);
+key=key.toLowerCase();
+$('#key').val(key);
+}
+ind = arr[i].indexOf('text');
+if (ind > -1) {
+text = arr[i].slice(ind+4+1);
+text=text.toLowerCase();
+$('#text').val(text);
+}
+}
+}
+//Функция, вызываемая после нажатия на кнопку «Encoding» (шифрование)
+
+$('#bClick').on('click', function(){
+var encode="";
+var decode="";
+$('#encode').val(encode);
+$('#decode').val(decode);
+
+//Анализ ключа (пустая строка)
+
+var key = $('#key').val();
+if (key==""){
+alert('This is the empty key!');
+return;}
+
+//Анализ ключа (неиспользуемые символы)
+key=$('#key').val().toLowerCase();
+$('#key').val(key);
+for(let i=0; i<key.length; i++){
+if (arr_en.indexOf(key[i])==-1) {
+alert('This is not used symbol "'+key[i]+'" in the key!');
+
+return;}
+
+}
+
+//Анализ шифруемого текста (пустая строка)
+var text = $('#text').val();
+if (text==""){
+alert('This is the empty text for encoding!');
+return;}
+
+//Анализ шифруемого текста (неиспользуемые символы)
+text=$('#text').val().toLowerCase();
+$('#text').val(text);
+for(let i=0; i<text.length; i++){
+if (arr_en.indexOf(text[i])==-1) {
+alert('This is not used symbol "'+text[i]+'" in the text!');
+
+return;}
+
+}
+
+//Создание «длинного» ключа для шифрования
+
+//making a long length of the key for its repetitions
+var longkey="";
+var j=0;
+for(let i=0; i<text.length; i++){//shift key for not used symbols!!!
+if (arr_en.indexOf(text[i])>-1){longkey += key[j %
+
+key.length];j++;}
+
+else {longkey += text[i];}
+}
+
+//Шифрование (расчет по формуле Вижинера)
+for(let i=0;i<text.length;i++){
+if (arr_en.indexOf(text[i])==-1) {encode += text[i];}
+else {encode += arr_en[(arr_en.indexOf(text[i]) +
+
+arr_en.indexOf(longkey[i])) % M];}
+
+}
+$('#encode').val(encode);
+//Дешифрование (расчет по формуле Вижинера)
+for(let i=0;i<encode.length;i++){
+y = 1;
+if (arr_en.indexOf(encode[i])>-1) {
+decode += arr_en[(arr_en.indexOf(encode[i]) + M -
+
+arr_en.indexOf(longkey[i])) % M];}
+
+else {decode += encode[i];}
+}
+$('#decode').val(decode);
+return;
+});
+</script>
+</html>
